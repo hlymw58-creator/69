@@ -161,11 +161,11 @@
       background-color: #f9f9f9;
     }
 
-    /* قالب شهادة التقدير المخفي حتى التوليد */
+    /* قالب شهادة التقدير المدمجة المخفي حتى التوليد */
     #certificate-template {
       width: 800px;
       height: 560px;
-      padding: 40px;
+      padding: 35px;
       background: #fff;
       border: 15px solid var(--primary-color);
       outline: 5px solid var(--accent-color);
@@ -177,11 +177,27 @@
       font-family: 'Cairo', sans-serif;
     }
 
-    .cert-title { font-size: 36px; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; }
-    .cert-sub { font-size: 20px; color: var(--accent-color); margin-bottom: 30px; font-weight: bold; }
-    .cert-body { font-size: 22px; line-height: 1.8; margin-bottom: 30px; }
-    .cert-name { font-size: 28px; color: var(--primary-color); font-weight: bold; text-decoration: underline; }
-    .cert-footer { display: flex; justify-content: space-between; margin-top: 40px; font-size: 18px; font-weight: bold; }
+    .cert-title { font-size: 32px; color: var(--primary-color); font-weight: 800; margin-bottom: 5px; }
+    .cert-sub { font-size: 18px; color: var(--accent-color); margin-bottom: 15px; font-weight: bold; }
+    .cert-body { font-size: 18px; line-height: 1.5; margin-bottom: 15px; }
+    .cert-name { font-size: 24px; color: var(--primary-color); font-weight: bold; text-decoration: underline; }
+    
+    .cert-subjects-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+    .cert-subjects-table th, .cert-subjects-table td {
+      border: 1px solid #b2d8c8;
+      padding: 6px;
+      font-size: 14px;
+    }
+    .cert-subjects-table th {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    .cert-footer { display: flex; justify-content: space-between; margin-top: 20px; font-size: 16px; font-weight: bold; }
 
     #certificates-output img {
       max-width: 100%;
@@ -262,24 +278,39 @@
 
   <!-- عرض شهادات التقدير المولدة -->
   <div class="card" id="cert-section" style="display: none;">
-    <h2>شهادات التقدير للطلاب المتفوقين (فوق 85%)</h2>
+    <h2>شهادات التقدير المدمجة للطلاب المتفوقين</h2>
     <div id="certificates-output"></div>
   </div>
 
 </div>
 
-<!-- قالب الشهادة المصمم (مخفي للتحويل إلى صورة) -->
+<!-- قالب الشهادة المدمجة المصمم (مخفي للتحويل إلى صورة) -->
 <div id="certificate-template">
-  <div class="cert-title">شهادة تقدير وتفوق</div>
-  <div class="cert-sub">في المادة الشرعية</div>
+  <div class="cert-title">شهادة تقدير وتفوق دراسي</div>
+  <div class="cert-sub">في العلوم الشرعية</div>
   <div class="cert-body">
     يشرفنا أن نتقدم بخالص الشكر والتقدير للطالب/طالبة:<br>
     <span class="cert-name" id="cert-student-name">...</span><br>
-    حيث حصل على درجة <b id="cert-score">...</b> في مادة <b id="cert-subject">...</b> بنسبة نجاح <b id="cert-percent">...</b>.
+    وذلك لتفوقه واجتيازه الامتحانات بتقدير ممتاز في المواد التالية:
   </div>
+  
+  <table class="cert-subjects-table">
+    <thead>
+      <tr>
+        <th>المادة</th>
+        <th>الدرجة الحاصل عليها</th>
+        <th>الدرجة العظمى</th>
+        <th>النسبة المئوية</th>
+      </tr>
+    </thead>
+    <tbody id="cert-table-body">
+      <!-- يتم تعبئة المواد ديناميكياً هنا للشهادة -->
+    </tbody>
+  </table>
+
   <div class="cert-footer">
     <div>معلم المادة: مستر أبو بكر الشافعي</div>
-    <div>تاريخ الامتحان: <span id="cert-date"></span></div>
+    <div>تاريخ الاصدار: <span id="cert-date"></span></div>
   </div>
 </div>
 
@@ -430,17 +461,32 @@
     outputDiv.innerHTML = '';
     document.getElementById('cert-section').style.display = 'block';
 
-    const topStudents = studentsData.filter(s => s.percentage >= 85);
+    // تجميع الطلاب الفريدين لمعرفة مواد كل طالب
+    const uniqueStudentNames = [...new Set(studentsData.map(s => s.name))];
+    let generatedCount = 0;
 
-    if (topStudents.length === 0) {
-      outputDiv.innerHTML = '<p>لا يوجد طلاب حصلوا على نسبة فوق 85% حتى الآن.</p>';
-    } else {
-      for (let st of topStudents) {
-        document.getElementById('cert-student-name').textContent = st.name;
-        document.getElementById('cert-score').textContent = `${st.score} من ${st.maxScore}`;
-        document.getElementById('cert-subject').textContent = st.subject;
-        document.getElementById('cert-percent').textContent = `%${st.percentage}`;
+    for (let studentName of uniqueStudentNames) {
+      // جلب مواد الطالب التي حصل فيها على نسبة 85% فأكثر
+      const studentExcellents = studentsData.filter(s => s.name === studentName && s.percentage >= 85);
+
+      if (studentExcellents.length > 0) {
+        document.getElementById('cert-student-name').textContent = studentName;
         document.getElementById('cert-date').textContent = new Date().toLocaleDateString('ar-EG');
+
+        // تعبئة جدول المواد داخل الشهادة المدمجة
+        const certTableBody = document.getElementById('cert-table-body');
+        certTableBody.innerHTML = '';
+
+        studentExcellents.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><b>${item.subject}</b></td>
+            <td>${item.score}</td>
+            <td>${item.maxScore}</td>
+            <td>%${item.percentage}</td>
+          `;
+          certTableBody.appendChild(tr);
+        });
 
         const certElem = document.getElementById('certificate-template');
         const canvas = await html2canvas(certElem, { scale: 2 });
@@ -451,8 +497,8 @@
         
         const downloadLink = document.createElement('a');
         downloadLink.href = imgUrl;
-        downloadLink.download = `شهادة_${st.name}_${st.subject}.png`;
-        downloadLink.innerText = `تحميل صورة شهادة (${st.name} - ${st.subject})`;
+        downloadLink.download = `شهادة_تقدير_${studentName}.png`;
+        downloadLink.innerText = `تحميل شهادة الطالب (${studentName})`;
         downloadLink.style.display = 'block';
         downloadLink.style.marginBottom = '20px';
         downloadLink.style.fontWeight = 'bold';
@@ -462,7 +508,12 @@
         wrapper.appendChild(downloadLink);
 
         outputDiv.appendChild(wrapper);
+        generatedCount++;
       }
+    }
+
+    if (generatedCount === 0) {
+      outputDiv.innerHTML = '<p>لا يوجد طلاب حصلوا على نسبة 85% أو أكثر في أي مادة حتى الآن.</p>';
     }
 
     await exportToPDF();
@@ -475,7 +526,6 @@
 
     pdfTitle.style.display = 'block';
 
-    // إجبار العنصر على العرض بشكل ثابت أثناء التقاط الصورة لتجنب التقطيع الموبايلي
     const originalWidth = printArea.style.width;
     printArea.style.width = "800px";
 
