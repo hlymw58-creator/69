@@ -161,43 +161,52 @@
       background-color: #f9f9f9;
     }
 
-    /* قالب شهادة التقدير المدمجة المخفي حتى التوليد */
+    /* قالب شهادة التقدير المدمجة والمنسقة (مخفي للتحويل إلى صورة) */
     #certificate-template {
       width: 800px;
       height: 560px;
-      padding: 35px;
+      padding: 25px 35px;
       background: #fff;
-      border: 15px solid var(--primary-color);
-      outline: 5px solid var(--accent-color);
+      border: 12px solid var(--primary-color);
+      outline: 4px solid var(--accent-color);
       position: absolute;
       left: -9999px;
       top: -9999px;
       box-sizing: border-box;
       text-align: center;
       font-family: 'Cairo', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
-    .cert-title { font-size: 32px; color: var(--primary-color); font-weight: 800; margin-bottom: 5px; }
-    .cert-sub { font-size: 18px; color: var(--accent-color); margin-bottom: 15px; font-weight: bold; }
-    .cert-body { font-size: 18px; line-height: 1.5; margin-bottom: 15px; }
-    .cert-name { font-size: 24px; color: var(--primary-color); font-weight: bold; text-decoration: underline; }
+    .cert-title { font-size: 28px; color: var(--primary-color); font-weight: 800; margin: 0; }
+    .cert-sub { font-size: 16px; color: var(--accent-color); margin-bottom: 5px; font-weight: bold; }
+    .cert-body { font-size: 16px; line-height: 1.4; margin: 5px 0; }
+    .cert-name { font-size: 22px; color: var(--primary-color); font-weight: bold; text-decoration: underline; }
     
+    .cert-table-container {
+      max-height: 200px;
+      overflow-y: auto;
+      margin: 5px auto;
+      width: 100%;
+    }
+
     .cert-subjects-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 10px 0;
     }
     .cert-subjects-table th, .cert-subjects-table td {
       border: 1px solid #b2d8c8;
-      padding: 6px;
-      font-size: 14px;
+      padding: 5px;
+      font-size: 13px;
     }
     .cert-subjects-table th {
       background-color: var(--secondary-color);
       color: white;
     }
 
-    .cert-footer { display: flex; justify-content: space-between; margin-top: 20px; font-size: 16px; font-weight: bold; }
+    .cert-footer { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; border-top: 1px solid #eee; padding-top: 5px; }
 
     #certificates-output img {
       max-width: 100%;
@@ -272,7 +281,7 @@
 
     <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
       <button class="btn btn-accent" onclick="showSheetAndGenerate()">إظهار الشيت وتوليد الشهادات والـ PDF</button>
-      <button class="btn btn-danger" onclick="resetAll()">إنشاء جدول جديد (تصفير)</button>
+      <button class="btn btn-danger" onclick="resetAll()">إنشاء جدول جديد (تصفير البيانات)</button>
     </div>
   </div>
 
@@ -284,29 +293,33 @@
 
 </div>
 
-<!-- قالب الشهادة المدمجة المصمم (مخفي للتحويل إلى صورة) -->
+<!-- قالب الشهادة المدمجة والمنسقة (مخفي للتحويل إلى صورة) -->
 <div id="certificate-template">
-  <div class="cert-title">شهادة تقدير وتفوق دراسي</div>
-  <div class="cert-sub">في العلوم الشرعية</div>
-  <div class="cert-body">
-    يشرفنا أن نتقدم بخالص الشكر والتقدير للطالب/طالبة:<br>
-    <span class="cert-name" id="cert-student-name">...</span><br>
-    وذلك لتفوقه واجتيازه الامتحانات بتقدير ممتاز في المواد التالية:
+  <div>
+    <div class="cert-title">شهادة تقدير وتفوق دراسي</div>
+    <div class="cert-sub">في العلوم الشرعية</div>
+    <div class="cert-body">
+      يشرفنا أن نتقدم بخالص الشكر والتقدير للطالب/طالبة:<br>
+      <span class="cert-name" id="cert-student-name">...</span><br>
+      وذلك لتفوقه واجتيازه الامتحانات بتقدير ممتاز في المواد التالية:
+    </div>
   </div>
   
-  <table class="cert-subjects-table">
-    <thead>
-      <tr>
-        <th>المادة</th>
-        <th>الدرجة الحاصل عليها</th>
-        <th>الدرجة العظمى</th>
-        <th>النسبة المئوية</th>
-      </tr>
-    </thead>
-    <tbody id="cert-table-body">
-      <!-- يتم تعبئة المواد ديناميكياً هنا للشهادة -->
-    </tbody>
-  </table>
+  <div class="cert-table-container">
+    <table class="cert-subjects-table">
+      <thead>
+        <tr>
+          <th>المادة</th>
+          <th>الدرجة الحاصل عليها</th>
+          <th>الدرجة العظمى</th>
+          <th>النسبة المئوية</th>
+        </tr>
+      </thead>
+      <tbody id="cert-table-body">
+        <!-- يتم تعبئة المواد ديناميكياً هنا للشهادة -->
+      </tbody>
+    </table>
+  </div>
 
   <div class="cert-footer">
     <div>معلم المادة: مستر أبو بكر الشافعي</div>
@@ -318,7 +331,13 @@
   let subjects = [];
   let studentsData = [];
 
+  // ضع رابط Google Apps Script الخاص بك هنا (الذي يقوم بالقراءة والكتابة)
   const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+
+  // تحميل البيانات المحفوظة من Google Sheet فور فتح الصفحة
+  window.addEventListener('DOMContentLoaded', () => {
+    loadFromGoogleSheet();
+  });
 
   function addSubject() {
     const container = document.getElementById('subjects-container');
@@ -407,7 +426,9 @@
         };
 
         studentsData.push(studentRecord);
-        sendToGoogleSheet(studentRecord);
+        
+        // إرسال البيانات الجديدة لحفظها في Google Sheet
+        sendToGoogleSheet({ action: "add", data: studentRecord });
         addedCount++;
       }
     });
@@ -443,11 +464,14 @@
   }
 
   function resetAll() {
-    if (confirm("هل أنت تأكد من إنشاء جدول جديد؟ سيتم مسح كافة البيانات الحالية.")) {
+    if (confirm("هل أنت متأكد من إنشاء جدول جديد؟ سيتم مسح كافة البيانات الحالية من النظام وGoogle Sheet.")) {
       studentsData = [];
       renderTable();
       document.getElementById('cert-section').style.display = 'none';
       document.getElementById('certificates-output').innerHTML = '';
+      
+      // إرسال أمر التصفير لـ Google Sheet
+      sendToGoogleSheet({ action: "reset" });
     }
   }
 
@@ -461,19 +485,16 @@
     outputDiv.innerHTML = '';
     document.getElementById('cert-section').style.display = 'block';
 
-    // تجميع الطلاب الفريدين لمعرفة مواد كل طالب
     const uniqueStudentNames = [...new Set(studentsData.map(s => s.name))];
     let generatedCount = 0;
 
     for (let studentName of uniqueStudentNames) {
-      // جلب مواد الطالب التي حصل فيها على نسبة 85% فأكثر
       const studentExcellents = studentsData.filter(s => s.name === studentName && s.percentage >= 85);
 
       if (studentExcellents.length > 0) {
         document.getElementById('cert-student-name').textContent = studentName;
         document.getElementById('cert-date').textContent = new Date().toLocaleDateString('ar-EG');
 
-        // تعبئة جدول المواد داخل الشهادة المدمجة
         const certTableBody = document.getElementById('cert-table-body');
         certTableBody.innerHTML = '';
 
@@ -519,13 +540,13 @@
     await exportToPDF();
   }
 
+  // دالة تصدير PDF متعدد الصفحات لمنع تكدس الطلاب في صفحة واحدة
   async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const printArea = document.getElementById('printable-area');
     const pdfTitle = document.getElementById('pdf-title');
 
     pdfTitle.style.display = 'block';
-
     const originalWidth = printArea.style.width;
     printArea.style.width = "800px";
 
@@ -542,21 +563,50 @@
     const pdf = new jsPDF('p', 'mm', 'a4');
     
     const imgWidth = 190;
+    const pageHeight = 295; // ارتفاع صفحة A4 بالملم
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    let heightLeft = imgHeight;
+    let position = 15; // الموضع الابتدائي للرأس
 
-    pdf.addImage(imgData, 'PNG', 10, 15, imgWidth, imgHeight);
+    // الصفحات المتعددة التلقائية
+    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    heightLeft -= (pageHeight - 20);
+
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
     pdf.save("كشف_درجات_الطلاب.pdf");
   }
 
-  function sendToGoogleSheet(data) {
+  // دوال الاتصال المباشر بـ Google Sheet (قراءة وحفظ)
+  function sendToGoogleSheet(payload) {
     if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") return;
 
     fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    }).catch(err => console.error("خطأ في الإرسال إلى Google Sheet:", err));
+      body: JSON.stringify(payload)
+    }).catch(err => console.error("خطأ في الاتصال بـ Google Sheet:", err));
+  }
+
+  function loadFromGoogleSheet() {
+    if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") return;
+
+    fetch(GOOGLE_SCRIPT_URL + "?action=get")
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data)) {
+          studentsData = data;
+          renderTable();
+        }
+      })
+      .catch(err => console.log("جاري الانتظار أو عدم وجود اتصال مسبق بالـ Script:", err));
   }
 </script>
 
