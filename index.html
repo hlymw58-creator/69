@@ -84,13 +84,6 @@
       font-size: 14px;
     }
 
-    .row {
-      display: flex;
-      gap: 15px;
-    }
-
-    .row .form-group { flex: 1; }
-
     .btn {
       background-color: var(--secondary-color);
       color: white;
@@ -129,10 +122,9 @@
       margin-bottom: 10px;
     }
 
-    /* تنسيق الجدول للتصدير المباشر بصورة ممتازة */
     .table-wrapper {
       background: #fff;
-      padding: 15px;
+      padding: 20px;
       border-radius: 8px;
       overflow-x: auto;
     }
@@ -146,9 +138,9 @@
 
     th, td {
       border: 1px solid #c2c2c2;
-      padding: 12px 8px;
+      padding: 10px 6px;
       text-align: center;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     th { 
@@ -161,12 +153,15 @@
       background-color: #f9f9f9;
     }
 
-    /* قالب شهادة التقدير المدمجة والمنسقة (مخفي للتحويل إلى صورة) */
+    /* قالب شهادة التقدير المدمجة بخلفية الشعار */
     #certificate-template {
       width: 800px;
       height: 560px;
       padding: 25px 35px;
-      background: #fff;
+      background: #fff url('https://i.ibb.co/6R32t1S/logo.png') no-repeat center center;
+      background-size: 300px 300px;
+      background-blend-mode: overlay;
+      background-color: rgba(255, 255, 255, 0.92);
       border: 12px solid var(--primary-color);
       outline: 4px solid var(--accent-color);
       position: absolute;
@@ -186,7 +181,7 @@
     .cert-name { font-size: 22px; color: var(--primary-color); font-weight: bold; text-decoration: underline; }
     
     .cert-table-container {
-      max-height: 200px;
+      max-height: 180px;
       overflow-y: auto;
       margin: 5px auto;
       width: 100%;
@@ -200,6 +195,7 @@
       border: 1px solid #b2d8c8;
       padding: 5px;
       font-size: 13px;
+      background: rgba(255, 255, 255, 0.9);
     }
     .cert-subjects-table th {
       background-color: var(--secondary-color);
@@ -226,7 +222,7 @@
     <p>مستر أبو بكر الشافعي - مدرس العلوم الشرعية</p>
   </div>
 
-  <!-- 1. إعداد مواد الامتحان والدرجات العظمى -->
+  <!-- 1. إعداد مواد الامتحان -->
   <div class="card">
     <h2>1. إعداد المواد والدرجات العظمى</h2>
     <div id="subjects-container">
@@ -239,7 +235,7 @@
     <button class="btn" onclick="addSubject()">+ إضافة مادة جديدة</button>
   </div>
 
-  <!-- 2. إدخال درجات الطالب لجميع المواد -->
+  <!-- 2. إدخال درجات الطالب -->
   <div class="card">
     <h2>2. تسجيل درجات طالب</h2>
     <div class="form-group">
@@ -249,9 +245,7 @@
 
     <div class="form-group">
       <label>درجات المواد:</label>
-      <div id="student-subjects-inputs">
-        <!-- يتم توليد حقول المواد ديناميكياً هنا -->
-      </div>
+      <div id="student-subjects-inputs"></div>
     </div>
 
     <button class="btn btn-block" onclick="addStudent()">تسجيل الطالب واستمرار التسجيل</button>
@@ -259,23 +253,12 @@
 
   <!-- 3. الجدول والإجراءات -->
   <div class="card">
-    <h2>3. قائمة الطلاب المسجلين</h2>
+    <h2>3. كشف درجات الطلاب المجمع</h2>
     <div class="table-wrapper" id="printable-area">
-      <h3 id="pdf-title" style="text-align: center; color: #1b4332; margin-top: 0; display: none;">كشف درجات الطلاب - مستر أبو بكر الشافعي</h3>
+      <h3 id="pdf-title" style="text-align: center; color: #1b4332; margin-top: 0; display: none;">بسم الله الرحمن الرحيم<br>كشف درجات الطلاب - مستر أبو بكر الشافعي</h3>
       <table id="students-table">
-        <thead>
-          <tr>
-            <th>م</th>
-            <th>اسم الطالب</th>
-            <th>المادة</th>
-            <th>الدرجة</th>
-            <th>الدرجة العظمى</th>
-            <th>النسبة المئوية</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- يتم ملء البيانات ديناميكيًا -->
-        </tbody>
+        <thead></thead>
+        <tbody></tbody>
       </table>
     </div>
 
@@ -293,11 +276,11 @@
 
 </div>
 
-<!-- قالب الشهادة المدمجة والمنسقة (مخفي للتحويل إلى صورة) -->
+<!-- قالب الشهادة المدمجة -->
 <div id="certificate-template">
   <div>
     <div class="cert-title">شهادة تقدير وتفوق دراسي</div>
-    <div class="cert-sub">في العلوم الشرعية</div>
+    <div class="cert-sub">مؤسسة الشافعي الصغير - العلوم الشرعية</div>
     <div class="cert-body">
       يشرفنا أن نتقدم بخالص الشكر والتقدير للطالب/طالبة:<br>
       <span class="cert-name" id="cert-student-name">...</span><br>
@@ -315,9 +298,7 @@
           <th>النسبة المئوية</th>
         </tr>
       </thead>
-      <tbody id="cert-table-body">
-        <!-- يتم تعبئة المواد ديناميكياً هنا للشهادة -->
-      </tbody>
+      <tbody id="cert-table-body"></tbody>
     </table>
   </div>
 
@@ -329,14 +310,24 @@
 
 <script>
   let subjects = [];
-  let studentsData = [];
+  let studentsRecords = {};
 
-  // ضع رابط Google Apps Script الخاص بك هنا (الذي يقوم بالقراءة والكتابة)
-  const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
-
-  // تحميل البيانات المحفوظة من Google Sheet فور فتح الصفحة
+  // تحميل البيانات المحفوظة محلياً فور فتح الصفحة حتى لو قفلتها أو مرّت أيام
   window.addEventListener('DOMContentLoaded', () => {
-    loadFromGoogleSheet();
+    const savedData = localStorage.getItem('abubakr_students_records');
+    const savedSubjects = localStorage.getItem('abubakr_subjects');
+
+    if (savedSubjects) {
+      subjects = JSON.parse(savedSubjects);
+      renderSubjectsInputsFromMemory();
+    } else {
+      refreshSubjectsList();
+    }
+
+    if (savedData) {
+      studentsRecords = JSON.parse(savedData);
+      renderTable();
+    }
   });
 
   function addSubject() {
@@ -357,6 +348,22 @@
     refreshSubjectsList();
   }
 
+  function renderSubjectsInputsFromMemory() {
+    const container = document.getElementById('subjects-container');
+    container.innerHTML = '';
+    subjects.forEach(sub => {
+      const div = document.createElement('div');
+      div.className = 'subject-item';
+      div.innerHTML = `
+        <input type="text" class="sub-name" placeholder="اسم المادة" value="${sub.name}">
+        <input type="number" class="sub-max" placeholder="الدرجة العظمى" value="${sub.max}">
+        <button class="btn btn-danger" onclick="removeSubject(this)">حذف</button>
+      `;
+      container.appendChild(div);
+    });
+    refreshSubjectsList();
+  }
+
   function refreshSubjectsList() {
     const nameInputs = document.querySelectorAll('.sub-name');
     const maxInputs = document.querySelectorAll('.sub-max');
@@ -370,7 +377,9 @@
       }
     });
 
+    localStorage.setItem('abubakr_subjects', JSON.stringify(subjects));
     renderStudentSubjectInputs();
+    renderTable();
   }
 
   function renderStudentSubjectInputs() {
@@ -387,57 +396,41 @@
       row.className = 'subject-score-row';
       row.innerHTML = `
         <span style="flex: 1; font-weight: 600;">${sub.name} <span style="font-size: 12px; color: gray;">(من ${sub.max})</span></span>
-        <input type="number" class="student-sub-score" data-subject="${sub.name}" data-max="${sub.max}" placeholder="أدخل الدرجة (اتركه فارغاً إن لم تختبر)">
+        <input type="number" class="student-sub-score" data-subject="${sub.name}" placeholder="الدرجة (اتركه فارغاً إن لم تختبر)">
       `;
       container.appendChild(row);
     });
   }
 
   document.getElementById('subjects-container').addEventListener('input', refreshSubjectsList);
-  refreshSubjectsList();
 
   function addStudent() {
     const name = document.getElementById('student-name').value.trim();
     if (!name) { alert("يرجى إدخال اسم الطالب!"); return; }
 
     const scoreInputs = document.querySelectorAll('.student-sub-score');
+    let studentScores = {};
     let addedCount = 0;
 
     scoreInputs.forEach(input => {
       const val = input.value.trim();
+      const subName = input.getAttribute('data-subject');
       if (val !== "") {
-        const score = parseFloat(val);
-        const subName = input.getAttribute('data-subject');
-        const maxScore = parseFloat(input.getAttribute('data-max'));
-
-        if (score > maxScore) {
-          alert(`الدرجة المدخلة في مادة (${subName}) أكبر من الدرجة العظمى (${maxScore})!`);
-          return;
-        }
-
-        const percentage = ((score / maxScore) * 100).toFixed(1);
-
-        const studentRecord = {
-          name,
-          subject: subName,
-          score,
-          maxScore,
-          percentage: parseFloat(percentage)
-        };
-
-        studentsData.push(studentRecord);
-        
-        // إرسال البيانات الجديدة لحفظها في Google Sheet
-        sendToGoogleSheet({ action: "add", data: studentRecord });
+        studentScores[subName] = parseFloat(val);
         addedCount++;
       }
     });
 
     if (addedCount === 0) {
-      alert("يرجى إدخال درجة واحدة على الأقل للطالب في إحدى المواد!");
+      alert("يرجى إدخال درجة واحدة على الأقل للطالب!");
       return;
     }
 
+    studentsRecords[name] = studentScores;
+    
+    // حفظ فوري محلياً لضمان عدم ضياع البيانات عند غلق الصفحة أو تحديثها
+    localStorage.setItem('abubakr_students_records', JSON.stringify(studentsRecords));
+    
     renderTable();
 
     document.getElementById('student-name').value = '';
@@ -446,37 +439,41 @@
   }
 
   function renderTable() {
-    const tbody = document.querySelector('#students-table tbody');
-    tbody.innerHTML = '';
-
-    studentsData.forEach((st, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${idx + 1}</td>
-        <td>${st.name}</td>
-        <td>${st.subject}</td>
-        <td>${st.score}</td>
-        <td>${st.maxScore}</td>
-        <td>%${st.percentage}</td>
-      `;
-      tbody.appendChild(tr);
+    const table = document.getElementById('students-table');
+    let theadHTML = `<tr><th>م</th><th>اسم الطالب</th>`;
+    subjects.forEach(sub => {
+      theadHTML += `<th>${sub.name}</th>`;
     });
+    theadHTML += `</tr>`;
+    
+    let tbodyHTML = ``;
+    let idx = 1;
+
+    for (let studentName in studentsRecords) {
+      tbodyHTML += `<tr><td>${idx++}</td><td style="font-weight: bold; text-align: right; padding-right: 10px;">${studentName}</td>`;
+      subjects.forEach(sub => {
+        let score = studentsRecords[studentName][sub.name];
+        tbodyHTML += `<td>${score !== undefined ? score : '-'}</td>`;
+      });
+      tbodyHTML += `</tr>`;
+    }
+
+    table.querySelector('thead').innerHTML = theadHTML;
+    table.querySelector('tbody').innerHTML = tbodyHTML;
   }
 
   function resetAll() {
-    if (confirm("هل أنت متأكد من إنشاء جدول جديد؟ سيتم مسح كافة البيانات الحالية من النظام وGoogle Sheet.")) {
-      studentsData = [];
+    if (confirm("هل أنت متأكد من مسح جميع البيانات وتصفير الجدول؟")) {
+      studentsRecords = {};
+      localStorage.removeItem('abubakr_students_records');
       renderTable();
       document.getElementById('cert-section').style.display = 'none';
       document.getElementById('certificates-output').innerHTML = '';
-      
-      // إرسال أمر التصفير لـ Google Sheet
-      sendToGoogleSheet({ action: "reset" });
     }
   }
 
   async function showSheetAndGenerate() {
-    if (studentsData.length === 0) {
+    if (Object.keys(studentsRecords).length === 0) {
       alert("لا يوجد طلاب مسجلون حتى الآن!");
       return;
     }
@@ -485,11 +482,25 @@
     outputDiv.innerHTML = '';
     document.getElementById('cert-section').style.display = 'block';
 
-    const uniqueStudentNames = [...new Set(studentsData.map(s => s.name))];
     let generatedCount = 0;
 
-    for (let studentName of uniqueStudentNames) {
-      const studentExcellents = studentsData.filter(s => s.name === studentName && s.percentage >= 85);
+    for (let studentName in studentsRecords) {
+      let studentExcellents = [];
+      
+      subjects.forEach(sub => {
+        let score = studentsRecords[studentName][sub.name];
+        if (score !== undefined) {
+          let percentage = (score / sub.max) * 100;
+          if (percentage >= 85) {
+            studentExcellents.push({
+              subject: sub.name,
+              score: score,
+              maxScore: sub.max,
+              percentage: percentage.toFixed(1)
+            });
+          }
+        }
+      });
 
       if (studentExcellents.length > 0) {
         document.getElementById('cert-student-name').textContent = studentName;
@@ -510,7 +521,7 @@
         });
 
         const certElem = document.getElementById('certificate-template');
-        const canvas = await html2canvas(certElem, { scale: 2 });
+        const canvas = await html2canvas(certElem, { scale: 2, useCORS: true });
         const imgUrl = canvas.toDataURL('image/png');
 
         const imgTag = document.createElement('img');
@@ -540,7 +551,6 @@
     await exportToPDF();
   }
 
-  // دالة تصدير PDF متعدد الصفحات لمنع تكدس الطلاب في صفحة واحدة
   async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const printArea = document.getElementById('printable-area');
@@ -562,51 +572,24 @@
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     
-    const imgWidth = 190;
-    const pageHeight = 295; // ارتفاع صفحة A4 بالملم
+    const imgWidth = 190; 
+    const pageHeight = 280; 
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
     let heightLeft = imgHeight;
-    let position = 15; // الموضع الابتدائي للرأس
+    let position = 10;
 
-    // الصفحات المتعددة التلقائية
     pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-    heightLeft -= (pageHeight - 20);
+    heightLeft -= pageHeight;
 
     while (heightLeft >= 0) {
-      position = heightLeft - imgHeight;
+      position = heightLeft - imgHeight + 15; 
       pdf.addPage();
       pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
     }
 
     pdf.save("كشف_درجات_الطلاب.pdf");
-  }
-
-  // دوال الاتصال المباشر بـ Google Sheet (قراءة وحفظ)
-  function sendToGoogleSheet(payload) {
-    if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") return;
-
-    fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }).catch(err => console.error("خطأ في الاتصال بـ Google Sheet:", err));
-  }
-
-  function loadFromGoogleSheet() {
-    if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") return;
-
-    fetch(GOOGLE_SCRIPT_URL + "?action=get")
-      .then(res => res.json())
-      .then(data => {
-        if (data && Array.isArray(data)) {
-          studentsData = data;
-          renderTable();
-        }
-      })
-      .catch(err => console.log("جاري الانتظار أو عدم وجود اتصال مسبق بالـ Script:", err));
   }
 </script>
 
