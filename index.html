@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الامتحانات المباشرة - مستر أبو بكر الشافعي</title>
+  
+  <!-- Fonts & Libraries -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #1b4332;
+      --secondary-color: #2d6a4f;
+      --accent-color: #d4af37;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #2b2b2b;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+    .header p { margin: 0; opacity: 0.9; font-size: 16px; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-top: 4px solid var(--primary-color);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: var(--primary-color);
+      font-size: 20px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+    }
+
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .subject-input-card {
+      background: #f1f8f5;
+      border: 1px solid #b7e4c7;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .subject-input-card label {
+      font-size: 14px;
+      color: var(--primary-color);
+    }
+
+    .btn {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-size: 15px;
+      font-weight: bold;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+
+    .btn:hover { background-color: var(--primary-color); }
+    .btn-accent { background-color: var(--accent-color); color: #000; }
+    .btn-accent:hover { background-color: #b59226; }
+    .btn-danger { background-color: #e63946; }
+    .btn-danger:hover { background-color: #c1121f; }
+    .btn-block { width: 100%; margin-top: 10px; }
+
+    .subject-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .table-wrapper {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background-color: #ffffff;
+    }
+
+    th, td {
+      border: 1px solid #c2c2c2;
+      padding: 10px 6px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th { 
+      background-color: var(--primary-color); 
+      color: white; 
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    /* قالب شهادة التقدير المخفي حتى التوليد */
+    #certificate-template {
+      width: 800px;
+      height: 560px;
+      padding: 40px;
+      background: #fff;
+      border: 15px solid var(--primary-color);
+      outline: 5px solid var(--accent-color);
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      box-sizing: border-box;
+      text-align: center;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .cert-title { font-size: 36px; color: var(--primary-color); font-weight: 800; margin-bottom: 5px; }
+    .cert-sub { font-size: 20px; color: var(--accent-color); margin-bottom: 20px; font-weight: bold; }
+    .cert-body { font-size: 20px; line-height: 1.8; margin-bottom: 20px; }
+    .cert-name { font-size: 26px; color: var(--primary-color); font-weight: bold; text-decoration: underline; }
+    .cert-details { font-size: 18px; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px dashed var(--secondary-color); margin: 15px 0; }
+    .cert-footer { display: flex; justify-content: space-between; margin-top: 30px; font-size: 17px; font-weight: bold; }
+
+    #certificates-output img {
+      max-width: 100%;
+      border: 2px solid var(--accent-color);
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="header">
+    <h1>منصة إدارة الامتحانات المباشرة</h1>
+    <p>مستر أبو بكر الشافعي - مدرس العلوم الشرعية</p>
+  </div>
+
+  <!-- 1. إعداد مواد الامتحان والدرجات العظمى -->
+  <div class="card">
+    <h2>1. إعداد المواد والدرجات العظمى للامتحان</h2>
+    <div id="subjects-container">
+      <div class="subject-item">
+        <input type="text" class="sub-name" placeholder="اسم المادة (مثال: الفقه)" value="الفقه">
+        <input type="number" class="sub-max" placeholder="الدرجة العظمى" value="50">
+        <button class="btn btn-danger" onclick="removeSubject(this)">حذف</button>
+      </div>
+      <div class="subject-item">
+        <input type="text" class="sub-name" placeholder="اسم المادة (مثال: التوحيد)" value="التوحيد">
+        <input type="number" class="sub-max" placeholder="الدرجة العظمى" value="50">
+        <button class="btn btn-danger" onclick="removeSubject(this)">حذف</button>
+      </div>
+    </div>
+    <button class="btn" onclick="addSubject()">+ إضافة مادة أخرى</button>
+  </div>
+
+  <!-- 2. إدخال درجات الطالب لجميع المواد -->
+  <div class="card">
+    <h2>2. تسجيل درجات الطالب</h2>
+    <div class="form-group">
+      <label>اسم الطالب:</label>
+      <input type="text" id="student-name" placeholder="أدخل اسم الطالب ثلاثي">
+    </div>
+
+    <label style="margin-bottom: 10px; color: var(--primary-color);">درجات الطالب في المواد المحددّة:</label>
+    <div id="student-scores-inputs" class="subjects-grid">
+      <!-- يتم إنشاء حقول الدرجات للمواد المضافة تلقائياً -->
+    </div>
+
+    <button class="btn btn-block" onclick="addStudent()">تسجيل الطالب واستمرار التسجيل</button>
+  </div>
+
+  <!-- 3. الجدول والإجراءات -->
+  <div class="card">
+    <h2>3. قائمة الطلاب المسجلين</h2>
+    <div class="table-wrapper" id="printable-area">
+      <h3 id="pdf-title" style="text-align: center; color: #1b4332; margin-top: 0; display: none;">كشف درجات الطلاب - مستر أبو بكر الشافعي</h3>
+      <table id="students-table">
+        <thead id="table-head">
+          <!-- يتم ملء الهيدر ديناميكياً بحسب المواد -->
+        </thead>
+        <tbody id="table-body">
+          <!-- يتم ملء البيانات ديناميكيًا -->
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <button class="btn btn-accent" onclick="showSheetAndGenerate()">إظهار الشيت وتوليد الشهادات والـ PDF</button>
+      <button class="btn btn-danger" onclick="resetAll()">إنشاء جدول جديد (تصفير)</button>
+    </div>
+  </div>
+
+  <!-- عرض شهادات التقدير المولدة -->
+  <div class="card" id="cert-section" style="display: none;">
+    <h2>شهادات التقدير للطلاب المتفوقين (فوق 85% في المجموع الكلي)</h2>
+    <div id="certificates-output"></div>
+  </div>
+
+</div>
+
+<!-- قالب الشهادة المصمم (مخفي للتحويل إلى صورة) -->
+<div id="certificate-template">
+  <div class="cert-title">شهادة تقدير وتفوق</div>
+  <div class="cert-sub">في الاختبار الشرعي</div>
+  <div class="cert-body">
+    يشرفنا أن نتقدم بخالص الشكر والتقدير للطالب/طالبة:<br>
+    <span class="cert-name" id="cert-student-name">...</span><br>
+    لتفوقه في الاختبار الشرعي والحصول على نسبة نجاح عامة: <b id="cert-percent" style="color: var(--primary-color);">...</b>
+  </div>
+  <div class="cert-details" id="cert-subjects-breakdown">
+    <!-- تفاصيل الدرجات لكل مادة -->
+  </div>
+  <div class="cert-footer">
+    <div>معلم المادة: مستر أبو بكر الشافعي</div>
+    <div>تاريخ الامتحان: <span id="cert-date"></span></div>
+  </div>
+</div>
+
+<script>
+  let subjects = [];
+  let studentsData = [];
+
+  const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+
+  function addSubject() {
+    const container = document.getElementById('subjects-container');
+    const div = document.createElement('div');
+    div.className = 'subject-item';
+    div.innerHTML = `
+      <input type="text" class="sub-name" placeholder="اسم المادة">
+      <input type="number" class="sub-max" placeholder="الدرجة العظمى">
+      <button class="btn btn-danger" onclick="removeSubject(this)">حذف</button>
+    `;
+    container.appendChild(div);
+    refreshSubjectsList();
+  }
+
+  function removeSubject(btn) {
+    btn.parentElement.remove();
+    refreshSubjectsList();
+  }
+
+  function refreshSubjectsList() {
+    const nameInputs = document.querySelectorAll('.sub-name');
+    const maxInputs = document.querySelectorAll('.sub-max');
+    subjects = [];
+
+    nameInputs.forEach((input, index) => {
+      const name = input.value.trim();
+      const max = parseFloat(maxInputs[index].value) || 0;
+      if (name && max > 0) {
+        subjects.push({ name, max });
+      }
+    });
+
+    renderStudentScoreInputs();
+    renderTableHeader();
+  }
+
+  function renderStudentScoreInputs() {
+    const container = document.getElementById('student-scores-inputs');
+    container.innerHTML = '';
+
+    if (subjects.length === 0) {
+      container.innerHTML = '<p style="color:red;">يرجى إدخال مادة واحدة على الأقل في خطوة الإعداد أعلاه.</p>';
+      return;
+    }
+
+    subjects.forEach((sub, idx) => {
+      const div = document.createElement('div');
+      div.className = 'subject-input-card';
+      div.innerHTML = `
+        <label><b>${sub.name}</b> (من ${sub.max}):</label>
+        <input type="number" class="score-input-item" data-index="${idx}" placeholder="درجة ${sub.name}">
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function renderTableHeader() {
+    const thead = document.getElementById('table-head');
+    let html = `<tr><th>م</th><th>اسم الطالب</th>`;
+
+    subjects.forEach(sub => {
+      html += `<th>${sub.name} (${sub.max})</th>`;
+    });
+
+    html += `<th>المجموع</th><th>النسبة المئوية</th></tr>`;
+    thead.innerHTML = html;
+  }
+
+  document.getElementById('subjects-container').addEventListener('input', refreshSubjectsList);
+  refreshSubjectsList();
+
+  function addStudent() {
+    const name = document.getElementById('student-name').value.trim();
+    if (!name) { alert("يرجى إدخال اسم الطالب!"); return; }
+
+    const scoreInputs = document.querySelectorAll('.score-input-item');
+    let scores = {};
+    let totalObtained = 0;
+    let totalMax = 0;
+    let hasError = false;
+
+    scoreInputs.forEach(input => {
+      const idx = input.getAttribute('data-index');
+      const sub = subjects[idx];
+      const val = parseFloat(input.value);
+
+      if (isNaN(val)) {
+        alert(`يرجى إدخال درجة صالحة لمادة: ${sub.name}`);
+        hasError = true;
+        return;
+      }
+      if (val > sub.max) {
+        alert(`الدرجة في مادة ${sub.name} (${val}) أكبر من الدرجة العظمى (${sub.max})!`);
+        hasError = true;
+        return;
+      }
+
+      scores[sub.name] = val;
+      totalObtained += val;
+      totalMax += sub.max;
+    });
+
+    if (hasError) return;
+
+    const totalPercentage = ((totalObtained / totalMax) * 100).toFixed(1);
+
+    const studentRecord = {
+      name,
+      scores,
+      totalObtained,
+      totalMax,
+      percentage: parseFloat(totalPercentage)
+    };
+
+    studentsData.push(studentRecord);
+    renderTableBody();
+
+    // إرسال البيانات لـ Google Sheet
+    sendToGoogleSheet(studentRecord);
+
+    // تفريغ الحقول لإدخال الطالب التالي
+    document.getElementById('student-name').value = '';
+    scoreInputs.forEach(input => input.value = '');
+    document.getElementById('student-name').focus();
+  }
+
+  function renderTableBody() {
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = '';
+
+    studentsData.forEach((st, idx) => {
+      const tr = document.createElement('tr');
+      let html = `<td>${idx + 1}</td><td><b>${st.name}</b></td>`;
+
+      subjects.forEach(sub => {
+        const score = st.scores[sub.name] !== undefined ? st.scores[sub.name] : '-';
+        html += `<td>${score}</td>`;
+      });
+
+      html += `<td>${st.totalObtained} / ${st.totalMax}</td>`;
+      html += `<td><b>%${st.percentage}</b></td>`;
+
+      tr.innerHTML = html;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function resetAll() {
+    if (confirm("هل أنت تأكد من إنشاء جدول جديد؟ سيتم مسح كافة البيانات الحالية.")) {
+      studentsData = [];
+      renderTableBody();
+      document.getElementById('cert-section').style.display = 'none';
+      document.getElementById('certificates-output').innerHTML = '';
+    }
+  }
+
+  async function showSheetAndGenerate() {
+    if (studentsData.length === 0) {
+      alert("لا يوجد طلاب مسجلون حتى الآن!");
+      return;
+    }
+
+    // 1. توليد شهادات التقدير للطلاب المتفوقين (فوق 85% المجموع الكلي)
+    const outputDiv = document.getElementById('certificates-output');
+    outputDiv.innerHTML = '';
+    document.getElementById('cert-section').style.display = 'block';
+
+    const topStudents = studentsData.filter(s => s.percentage >= 85);
+
+    if (topStudents.length === 0) {
+      outputDiv.innerHTML = '<p>لا يوجد طلاب حصلوا على نسبة 85% فأكثر في المجموع الكلي حتى الآن.</p>';
+    } else {
+      for (let st of topStudents) {
+        document.getElementById('cert-student-name').textContent = st.name;
+        document.getElementById('cert-percent').textContent = `%${st.percentage}`;
+        document.getElementById('cert-date').textContent = new Date().toLocaleDateString('ar-EG');
+
+        // بناء تفاصيل الدرجات لكل مادة
+        let detailsText = "الدرجات: ";
+        subjects.forEach((sub, i) => {
+          detailsText += `${sub.name}: (${st.scores[sub.name]}/${sub.max})`;
+          if (i < subjects.length - 1) detailsText += " | ";
+        });
+        detailsText += ` — [ المجموع الكلي: ${st.totalObtained} من ${st.totalMax} ]`;
+        document.getElementById('cert-subjects-breakdown').textContent = detailsText;
+
+        const certElem = document.getElementById('certificate-template');
+        
+        const canvas = await html2canvas(certElem, { scale: 2 });
+        const imgUrl = canvas.toDataURL('image/png');
+
+        const imgTag = document.createElement('img');
+        imgTag.src = imgUrl;
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = imgUrl;
+        downloadLink.download = `شهادة_${st.name}.png`;
+        downloadLink.innerText = `تحميل صورة شهادة الطالب (${st.name})`;
+        downloadLink.style.display = 'block';
+        downloadLink.style.marginBottom = '20px';
+        downloadLink.style.fontWeight = 'bold';
+
+        const wrapper = document.createElement('div');
+        wrapper.appendChild(imgTag);
+        wrapper.appendChild(downloadLink);
+
+        outputDiv.appendChild(wrapper);
+      }
+    }
+
+    // 2. تصدير كشف الدرجات باللغة العربية كملف PDF
+    await exportToPDF();
+  }
+
+  async function exportToPDF() {
+    const printArea = document.getElementById('printable-area');
+    const pdfTitle = document.getElementById('pdf-title');
+
+    pdfTitle.style.display = 'block';
+
+    const canvas = await html2canvas(printArea, { scale: 2, useCORS: true });
+
+    pdfTitle.style.display = 'none';
+
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    const imgWidth = 190;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 10, 15, imgWidth, imgHeight);
+    pdf.save("كشف_درجات_الطلاب.pdf");
+  }
+
+  function sendToGoogleSheet(studentData) {
+    if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") return;
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(studentData)
+    }).catch(err => console.error("خطأ في الإرسال إلى Google Sheet:", err));
+  }
+</script>
+
+</body>
+</html>
