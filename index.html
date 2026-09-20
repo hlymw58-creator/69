@@ -42,10 +42,32 @@
       border-radius: 12px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       margin-bottom: 25px;
+      position: relative;
     }
 
     .header h1 { margin: 0 0 10px 0; font-size: 28px; }
     .header p { margin: 0; opacity: 0.9; font-size: 16px; }
+
+    .header-btns {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .top-action-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-size: 13px;
+      transition: background 0.3s;
+    }
+    .top-action-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
     .card {
       background: var(--card-bg);
@@ -105,6 +127,37 @@
     .btn-danger:hover { background-color: #c1121f; }
     .btn-block { width: 100%; margin-top: 10px; }
 
+    .auth-container {
+      max-width: 400px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border-top: 5px solid var(--primary-color);
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #777;
+    }
+
+    .auth-tab.active {
+      color: var(--primary-color);
+      border-bottom: 3px solid var(--primary-color);
+      margin-bottom: -2px;
+    }
+
     .subject-item {
       display: flex;
       gap: 10px;
@@ -153,17 +206,17 @@
       background-color: #f9f9f9;
     }
 
-    /* قالب شهادة التقدير المدمجة بخلفية الشعار */
+    /* قالب شهادة التقدير بخلفية فاخرة */
     #certificate-template {
       width: 800px;
       height: 560px;
-      padding: 25px 35px;
+      padding: 30px 45px;
       background: #fff url('https://i.ibb.co/6R32t1S/logo.png') no-repeat center center;
-      background-size: 300px 300px;
+      background-size: 320px 320px;
       background-blend-mode: overlay;
-      background-color: rgba(255, 255, 255, 0.92);
-      border: 12px solid var(--primary-color);
-      outline: 4px solid var(--accent-color);
+      background-color: rgba(255, 255, 255, 0.94);
+      border: 14px solid var(--primary-color);
+      outline: 5px solid var(--accent-color);
       position: absolute;
       left: -9999px;
       top: -9999px;
@@ -211,23 +264,99 @@
       margin-bottom: 15px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+
+    /* مودال السجلات التاريخية */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      width: 85%;
+      max-width: 700px;
+      max-height: 80vh;
+      border-radius: 10px;
+      padding: 25px;
+      overflow-y: auto;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    .log-item {
+      background: #f1f5f3;
+      border: 1px solid #d1e2db;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
 
-<div class="container">
-  
-  <div class="header">
-    <h1>منصة إدارة الامتحانات المباشرة</h1>
-    <p>مستر أبو بكر الشافعي - مدرس العلوم الشرعية</p>
+<!-- شاشة تسجيل الدخول وإنشاء الحساب -->
+<div id="auth-screen" class="auth-container">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <h2 style="color: var(--primary-color); margin: 0;">منصة الامتحانات</h2>
+    <p style="color: #666; font-size: 14px;">مستر أبو بكر الشافعي</p>
   </div>
 
-  <!-- 1. إعداد مواد الامتحان -->
+  <div class="auth-tabs">
+    <div id="tab-login" class="auth-tab active" onclick="switchAuthTab('login')">تسجيل الدخول</div>
+    <div id="tab-register" class="auth-tab" onclick="switchAuthTab('register')">إنشاء حساب جديد</div>
+  </div>
+
+  <div id="login-form">
+    <div class="form-group">
+      <label>رقم الهاتف:</label>
+      <input type="text" id="login-phone" placeholder="أدخل رقم هاتفك">
+    </div>
+    <div class="form-group">
+      <label>كلمة السر:</label>
+      <input type="password" id="login-pass" placeholder="أدخل كلمة السر">
+    </div>
+    <button class="btn btn-block" onclick="handleLogin()">دخول للسجل الخاص بي</button>
+  </div>
+
+  <div id="register-form" style="display: none;">
+    <div class="form-group">
+      <label>الاسم الكامل:</label>
+      <input type="text" id="reg-name" placeholder="مثال: مستر أبو بكر">
+    </div>
+    <div class="form-group">
+      <label>رقم الهاتف:</label>
+      <input type="text" id="reg-phone" placeholder="رقم الهاتف (للتسجيل والدخول)">
+    </div>
+    <div class="form-group">
+      <label>كلمة السر:</label>
+      <input type="password" id="reg-pass" placeholder="كلمة السر">
+    </div>
+    <button class="btn btn-block btn-accent" onclick="handleRegister()">إنشاء الحساب وبدء العمل</button>
+  </div>
+</div>
+
+<!-- لوحة التحكم الرئيسية -->
+<div id="dashboard-screen" class="container" style="display: none;">
+  
+  <div class="header">
+    <div class="header-btns">
+      <button class="top-action-btn" onclick="openLogsModal()">سجلات الإصدارات التاريخية</button>
+      <button class="top-action-btn" style="background: rgba(230,57,70,0.3);" onclick="handleLogout()">تسجيل الخروج</button>
+    </div>
+    <h1>منصة إدارة الامتحانات المباشرة</h1>
+    <p id="welcome-user-txt">أهلاً بك</p>
+  </div>
+
   <div class="card">
     <h2>1. إعداد المواد والدرجات العظمى</h2>
     <div id="subjects-container">
       <div class="subject-item">
-        <input type="text" class="sub-name" placeholder="اسم المادة (مثال: الفقه)" value="الفقه">
+        <input type="text" class="sub-name" placeholder="اسم المادة" value="الفقه">
         <input type="number" class="sub-max" placeholder="الدرجة العظمى" value="100">
         <button class="btn btn-danger" onclick="removeSubject(this)">حذف</button>
       </div>
@@ -235,7 +364,6 @@
     <button class="btn" onclick="addSubject()">+ إضافة مادة جديدة</button>
   </div>
 
-  <!-- 2. إدخال درجات الطالب -->
   <div class="card">
     <h2>2. تسجيل درجات طالب</h2>
     <div class="form-group">
@@ -248,10 +376,9 @@
       <div id="student-subjects-inputs"></div>
     </div>
 
-    <button class="btn btn-block" onclick="addStudent()">تسجيل الطالب واستمرار التسجيل</button>
+    <button class="btn btn-block" onclick="addStudent()">تسجيل الطالب في سجلك الخاص</button>
   </div>
 
-  <!-- 3. الجدول والإجراءات -->
   <div class="card">
     <h2>3. كشف درجات الطلاب المجمع</h2>
     <div class="table-wrapper" id="printable-area">
@@ -264,16 +391,29 @@
 
     <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
       <button class="btn btn-accent" onclick="showSheetAndGenerate()">إظهار الشيت وتوليد الشهادات والـ PDF</button>
-      <button class="btn btn-danger" onclick="resetAll()">إنشاء جدول جديد (تصفير البيانات)</button>
+      <button class="btn btn-danger" onclick="resetAll()">تصفير سجل هذا الحساب</button>
     </div>
   </div>
 
-  <!-- عرض شهادات التقدير المولدة -->
   <div class="card" id="cert-section" style="display: none;">
     <h2>شهادات التقدير المدمجة للطلاب المتفوقين</h2>
     <div id="certificates-output"></div>
   </div>
 
+</div>
+
+<!-- مودال عرض السجلات التاريخية -->
+<div id="logs-modal" class="modal-overlay">
+  <div class="modal-content">
+    <h2 style="color: var(--primary-color); margin-top: 0;">سجلات الإصدارات التاريخية (شيتات وشهادات)</h2>
+    <div id="logs-container">
+      <p>لا توجد سجلات محفوظة حتى الآن.</p>
+    </div>
+    <div style="text-align: left; margin-top: 20px;">
+      <button class="btn btn-danger" onclick="clearLogs()">مسح جميع السجلات</button>
+      <button class="btn" onclick="closeLogsModal()">إغلاق</button>
+    </div>
+  </div>
 </div>
 
 <!-- قالب الشهادة المدمجة -->
@@ -309,26 +449,111 @@
 </div>
 
 <script>
+  let currentUser = null;
   let subjects = [];
   let studentsRecords = {};
+  let userLogs = [];
 
-  // تحميل البيانات المحفوظة محلياً فور فتح الصفحة حتى لو قفلتها أو مرّت أيام
   window.addEventListener('DOMContentLoaded', () => {
-    const savedData = localStorage.getItem('abubakr_students_records');
-    const savedSubjects = localStorage.getItem('abubakr_subjects');
-
-    if (savedSubjects) {
-      subjects = JSON.parse(savedSubjects);
-      renderSubjectsInputsFromMemory();
-    } else {
-      refreshSubjectsList();
-    }
-
-    if (savedData) {
-      studentsRecords = JSON.parse(savedData);
-      renderTable();
+    const activePhone = localStorage.getItem('abubakr_active_user');
+    if (activePhone) {
+      loadUserData(activePhone);
     }
   });
+
+  function switchAuthTab(tab) {
+    if (tab === 'login') {
+      document.getElementById('tab-login').classList.add('active');
+      document.getElementById('tab-register').classList.remove('active');
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('register-form').style.display = 'none';
+    } else {
+      document.getElementById('tab-register').classList.add('active');
+      document.getElementById('tab-login').classList.remove('active');
+      document.getElementById('register-form').style.display = 'block';
+      document.getElementById('login-form').style.display = 'none';
+    }
+  }
+
+  function handleRegister() {
+    const name = document.getElementById('reg-name').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const pass = document.getElementById('reg-pass').value.trim();
+
+    if (!name || !phone || !pass) {
+      alert("يرجى ملء جميع الحقول لإنشاء الحساب!");
+      return;
+    }
+
+    let users = JSON.parse(localStorage.getItem('abubakr_users_db') || '{}');
+    if (users[phone]) {
+      alert("رقم الهاتف هذا مسجل مسبقاً! يمكنك تسجيل الدخول مباشرة.");
+      switchAuthTab('login');
+      return;
+    }
+
+    users[phone] = {
+      name: name,
+      pass: pass,
+      subjects: [{ name: "الفقه", max: 100 }],
+      records: {},
+      logs: []
+    };
+
+    localStorage.setItem('abubakr_users_db', JSON.stringify(users));
+    alert("تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.");
+    switchAuthTab('login');
+    document.getElementById('login-phone').value = phone;
+  }
+
+  function handleLogin() {
+    const phone = document.getElementById('login-phone').value.trim();
+    const pass = document.getElementById('login-pass').value.trim();
+
+    let users = JSON.parse(localStorage.getItem('abubakr_users_db') || '{}');
+    if (!users[phone] || users[phone].pass !== pass) {
+      alert("رقم الهاتف أو كلمة السر غير صحيحة!");
+      return;
+    }
+
+    localStorage.setItem('abubakr_active_user', phone);
+    loadUserData(phone);
+  }
+
+  function loadUserData(phone) {
+    let users = JSON.parse(localStorage.getItem('abubakr_users_db') || '{}');
+    if (!users[phone]) return;
+
+    currentUser = phone;
+    subjects = users[phone].subjects || [];
+    studentsRecords = users[phone].records || {};
+    userLogs = users[phone].logs || [];
+
+    document.getElementById('welcome-user-txt').textContent = `أهلاً بك، ${users[phone].name}`;
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('dashboard-screen').style.display = 'block';
+
+    renderSubjectsInputsFromMemory();
+    renderTable();
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('abubakr_active_user');
+    currentUser = null;
+    document.getElementById('dashboard-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'block';
+  }
+
+  function saveCurrentUserData() {
+    if (!currentUser) return;
+    let users = JSON.parse(localStorage.getItem('abubakr_users_db') || '{}');
+    if (users[currentUser]) {
+      users[currentUser].subjects = subjects;
+      users[currentUser].records = studentsRecords;
+      users[currentUser].logs = userLogs;
+      localStorage.setItem('abubakr_users_db', JSON.stringify(users));
+    }
+  }
 
   function addSubject() {
     const container = document.getElementById('subjects-container');
@@ -377,7 +602,7 @@
       }
     });
 
-    localStorage.setItem('abubakr_subjects', JSON.stringify(subjects));
+    saveCurrentUserData();
     renderStudentSubjectInputs();
     renderTable();
   }
@@ -396,7 +621,7 @@
       row.className = 'subject-score-row';
       row.innerHTML = `
         <span style="flex: 1; font-weight: 600;">${sub.name} <span style="font-size: 12px; color: gray;">(من ${sub.max})</span></span>
-        <input type="number" class="student-sub-score" data-subject="${sub.name}" placeholder="الدرجة (اتركه فارغاً إن لم تختبر)">
+        <input type="number" class="student-sub-score" data-subject="${sub.name}" placeholder="الدرجة">
       `;
       container.appendChild(row);
     });
@@ -427,10 +652,7 @@
     }
 
     studentsRecords[name] = studentScores;
-    
-    // حفظ فوري محلياً لضمان عدم ضياع البيانات عند غلق الصفحة أو تحديثها
-    localStorage.setItem('abubakr_students_records', JSON.stringify(studentsRecords));
-    
+    saveCurrentUserData();
     renderTable();
 
     document.getElementById('student-name').value = '';
@@ -463,18 +685,53 @@
   }
 
   function resetAll() {
-    if (confirm("هل أنت متأكد من مسح جميع البيانات وتصفير الجدول؟")) {
+    if (confirm("هل أنت متأكد من مسح وتصفير سجل هذا الحساب؟")) {
       studentsRecords = {};
-      localStorage.removeItem('abubakr_students_records');
+      saveCurrentUserData();
       renderTable();
       document.getElementById('cert-section').style.display = 'none';
       document.getElementById('certificates-output').innerHTML = '';
     }
   }
 
+  function openLogsModal() {
+    const container = document.getElementById('logs-container');
+    container.innerHTML = '';
+
+    if (!userLogs || userLogs.length === 0) {
+      container.innerHTML = '<p>لا توجد سجلات إصدار محفوظة حتى الآن.</p>';
+    } else {
+      userLogs.forEach((log, index) => {
+        const div = document.createElement('div');
+        div.className = 'log-item';
+        div.innerHTML = `
+          <div>
+            <b>${log.title}</b><br>
+            <span style="font-size: 12px; color: #666;">التاريخ: ${log.date} | عدد الطلاب في السجل: ${log.studentsCount}</span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById('logs-modal').style.display = 'flex';
+  }
+
+  function closeLogsModal() {
+    document.getElementById('logs-modal').style.display = 'none';
+  }
+
+  function clearLogs() {
+    if (confirm("هل تريد مسح جميع السجلات التاريخية؟")) {
+      userLogs = [];
+      saveCurrentUserData();
+      openLogsModal();
+    }
+  }
+
   async function showSheetAndGenerate() {
     if (Object.keys(studentsRecords).length === 0) {
-      alert("لا يوجد طلاب مسجلون حتى الآن!");
+      alert("لا يوجد طلاب مسجلون في سجلك حتى الآن!");
       return;
     }
 
@@ -483,8 +740,10 @@
     document.getElementById('cert-section').style.display = 'block';
 
     let generatedCount = 0;
+    let studentNamesList = [];
 
     for (let studentName in studentsRecords) {
+      studentNamesList.push(studentName);
       let studentExcellents = [];
       
       subjects.forEach(sub => {
@@ -548,48 +807,75 @@
       outputDiv.innerHTML = '<p>لا يوجد طلاب حصلوا على نسبة 85% أو أكثر في أي مادة حتى الآن.</p>';
     }
 
-    await exportToPDF();
+    // تسجيل العملية في سجلات الحساب مع التاريخ
+    const nowStr = new Date().toLocaleString('ar-EG');
+    userLogs.push({
+      title: `إصدار شيت و${generatedCount} شهادة تقدير`,
+      date: nowStr,
+      studentsCount: studentNamesList.length
+    });
+    saveCurrentUserData();
+
+    await exportToPDFPaginated();
   }
 
-  async function exportToPDF() {
+  // دالة الـ PDF المخصصة بحيث تعرض 15 سطراً كحد أقصى لكل صفحة وتتمركز في وسط الصفحة بمسافات نظيفة
+  async function exportToPDFPaginated() {
     const { jsPDF } = window.jspdf;
-    const printArea = document.getElementById('printable-area');
-    const pdfTitle = document.getElementById('pdf-title');
-
-    pdfTitle.style.display = 'block';
-    const originalWidth = printArea.style.width;
-    printArea.style.width = "800px";
-
-    const canvas = await html2canvas(printArea, {
-      scale: 2,
-      useCORS: true,
-      windowWidth: 900
-    });
-
-    printArea.style.width = originalWidth;
-    pdfTitle.style.display = 'none';
-
-    const imgData = canvas.toDataURL('image/png');
+    const studentsKeys = Object.keys(studentsRecords);
+    const rowsPerPage = 15;
     const pdf = new jsPDF('p', 'mm', 'a4');
-    
-    const imgWidth = 190; 
-    const pageHeight = 280; 
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-    let heightLeft = imgHeight;
-    let position = 10;
 
-    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    for (let i = 0; i < studentsKeys.length; i += rowsPerPage) {
+      if (i > 0) pdf.addPage();
 
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight + 15; 
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // بناء جدول مخصص لـ 15 صفاً فقط في الصفحة الحالية
+      let chunkStudents = studentsKeys.slice(i, i + rowsPerPage);
+      
+      let tempDiv = document.createElement('div');
+      tempDiv.style.width = "750px";
+      tempDiv.style.background = "#fff";
+      tempDiv.style.padding = "20px";
+      tempDiv.style.fontFamily = "Cairo, sans-serif";
+      tempDiv.style.direction = "rtl";
+
+      let html = `<h3 style="text-align: center; color: #1b4332;">بسم الله الرحمن الرحيم<br>كشف درجات الطلاب - مستر أبو بكر الشافعي</h3>`;
+      html += `<table style="width:100%; border-collapse:collapse; margin-top:15px;">`;
+      html += `<thead><tr><th style="border:1px solid #c2c2c2; background:#1b4332; color:white; padding:8px;">م</th><th style="border:1px solid #c2c2c2; background:#1b4332; color:white; padding:8px;">اسم الطالب</th>`;
+      
+      subjects.forEach(sub => {
+        html += `<th style="border:1px solid #c2c2c2; background:#1b4332; color:white; padding:8px;">${sub.name}</th>`;
+      });
+      html += `</tr></thead><tbody>`;
+
+      let idx = i + 1;
+      chunkStudents.forEach(studentName => {
+        html += `<tr><td style="border:1px solid #c2c2c2; padding:8px; text-align:center;">${idx++}</td><td style="border:1px solid #c2c2c2; padding:8px; text-align:right; font-weight:bold;">${studentName}</td>`;
+        subjects.forEach(sub => {
+          let score = studentsRecords[studentName][sub.name];
+          html += `<td style="border:1px solid #c2c2c2; padding:8px; text-align:center;">${score !== undefined ? score : '-'}</td>`;
+        });
+        html += `</tr>`;
+      });
+      html += `</tbody></table>`;
+      tempDiv.innerHTML = html;
+      document.body.appendChild(tempDiv);
+
+      const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
+      document.body.removeChild(tempDiv);
+
+      const imgData = canvas.toDataURL('image/png');
+      
+      // أبعاد الصفحة ووضع الجدول في منتصف الصفحة تماماً مع هوامش وفوارغ نظيفة وحولها
+      const imgWidth = 180; 
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pageHeight = 297;
+      const topMargin = Math.max((pageHeight - imgHeight) / 2, 15); // تمركز عمودي في وسط الصفحة
+
+      pdf.addImage(imgData, 'PNG', 15, topMargin, imgWidth, imgHeight);
     }
 
-    pdf.save("كشف_درجات_الطلاب.pdf");
+    pdf.save("كشف_درجات_الطلاب_مرتب.pdf");
   }
 </script>
 
